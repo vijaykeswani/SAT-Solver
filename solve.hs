@@ -1,5 +1,9 @@
 module Satsolve where
-	import Control.Monad
+--	import Control.Monad.State.Strict
+--	import Data.Functor.Identity
+	
+	newtype State s a = State { runState :: (s -> (a,s)) }
+--	type State s = StateT s Identity
 
 	type Variable = String
 
@@ -56,6 +60,7 @@ module Satsolve where
 	getVal var ((x,y):xs) | (var == x) && (not y) = Fl
 	getVal var ((x,y):xs) | otherwise = getVal var xs
 
-	
+	stateFormula :: Formula -> State Assignment Formula
+	stateFormula formula = State $ assignValues formula	
 
 	
