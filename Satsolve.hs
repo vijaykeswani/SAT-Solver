@@ -1,9 +1,10 @@
 module Satsolve where
---	import Control.Monad.State.Strict
---	import Data.Functor.Identity
+	import qualified Control.Monad.State.Lazy as S
+        import Data.Functor.Identity
 	
-	newtype State s a = State { runState :: (s -> (a,s)) }
---	type State s = StateT s Identity
+--	newtype State s a = State { runState :: (s -> (a,s)) }
+--	type State s  = S.StateT s Identity
+     
 
 	type Variable = String
 
@@ -12,7 +13,7 @@ module Satsolve where
 	type Literal = BVariable Variable 
 	type Clause = [Literal]
 
-	data DoubtFul a =Mtrue 
+	data DoubtFul a = Mtrue 
 			| Mfalse 
 			| Assign [a]
 
@@ -60,8 +61,21 @@ module Satsolve where
 	getVal var ((x,y):xs) | (var == x) && (not y) = Fl
 	getVal var ((x,y):xs) | otherwise = getVal var xs
 
-	stateFormula :: Formula -> State Assignment Formula
-	stateFormula formula = State $ assignValues formula	
+--        modify :: (Assignment -> (Formula, Assignment)) -> (Assignment -> Identity -> (Formula, Assignment))
+
+        stateFormula :: Formula -> S.State Assignment Formula
+        stateFormula formula = do
+                                z <- S.get
+                                let (y,x) = assignValues formula z
+                                --let y = fst x
+                                return y
+
+--	stateFormula :: Formula -> S.State Assignment Formula
+--	stateFormula formula = S.StateT sFormula 
+--            where sFormula = do 
+--                                let x = assignValues formula
+--                                return x
+                                
 
 	mor :: Formula -> Formula -> Bool
 	mor Mfalse Mfalse = False

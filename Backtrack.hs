@@ -1,17 +1,18 @@
 --module Backtrack where
 	import Satsolve
-	
+        import qualified Control.Monad.State.Lazy as S
+
 	bt :: Formula -> [Variable] -> Bool
 	
 	bt formula [x] = mor form2 form3
-		where 	(form2, ass1) = runState stateF [(x,True)]
-			(form3, ass2) = runState stateF [(x,False)]
+		where 	(form2, ass1) = S.runState stateF [(x,True)]
+			(form3, ass2) = S.runState stateF [(x,False)]
 			stateF = stateFormula formula
 
 	bt formula (x:xs) = form4 || form5
-		where 	(form2, ass1) = runState stateF [(x,True)]
+		where 	(form2, ass1) = S.runState stateF [(x,True)]
 			form4 = bt form2 xs
-			(form3, ass2) = runState stateF [(x,False)]
+			(form3, ass2) = S.runState stateF [(x,False)]
 			form5 = bt form3 xs
 			stateF = stateFormula formula
 
