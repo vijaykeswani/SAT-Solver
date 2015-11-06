@@ -1,4 +1,4 @@
---module Backtrack where
+module Backtrack where
 	import Satsolve
         import qualified Control.Monad.State.Lazy as S
 
@@ -38,11 +38,20 @@
 		let c1 = literate $ words f
 		x2 <- getIn (num-1)
 		return (c1:x2)
-
+	
+	formA :: [Variable] -> [String] -> [(Variable, Bool)]
+	formA (v:vs) (x:xs) | x=="1" = (v,True): (formA vs xs)
+			| otherwise = (v,False) : (formA vs xs)
+	formA _ _ = []
+{-	
 	main = do
 		var <- getLine
 		num <- getLine
 		form <- getIn (read num)
 		print (bt (Assign form) (words var))		
 		print $ printf (Assign form)
-
+		ass <- getLine
+		let assgn = formA (words var) (words ass)
+		let a = (getUnsat (Assign form) assgn)	
+		print a
+-}

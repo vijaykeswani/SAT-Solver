@@ -26,15 +26,29 @@ module Satsolve where
 	assignValues :: Formula -> Assignment -> (Formula, Assignment)
 	assignValues Mtrue ass = (Mtrue, ass)
 	assignValues Mfalse ass = (Mfalse, ass)
-	assignValues (Assign lst) assignment = ((av1 lst assignment []), assignment)
+	assignValues (Assign lst) assignment = (assignCl lst assignment [], assignment)
 
-	av1 :: [Clause] -> Assignment -> [Clause] -> Formula
- 	av1 [] _ [] = Mtrue
-	av1 [] _ lst = Assign lst
-	av1 (x:xs) ass lst = case (av2 x ass []) of
+	getUnsat :: Formula -> Assignment -> Int
+	getUnsat Mtrue ass = 0
+	getUnsat Mfalse ass = 1
+	getUnsat (Assign lst) assignment = result
+		where (_,result) = av1 lst assignment [] 0
+
+	av1 :: [Clause] -> Assignment -> [Clause] -> Int -> (Formula,Int)
+ 	av1 [] _ [] n = (Mtrue, n)
+	av1 [] _ lst n = (Assign lst, n)
+	av1 (x:xs) ass lst n = case (av2 x ass []) of
+			Mfalse -> av1 xs ass lst (n+1)
+			Mtrue -> av1 xs ass lst n
+			Assign lst2 -> av1 xs ass (lst2 ++ lst) n
+
+	assignCl :: [Clause] -> Assignment -> [Clause] -> Formula
+ 	assignCl [] _ [] = Mtrue
+	assignCl [] _ lst = Assign lst
+	assignCl (x:xs) ass lst = case (av2 x ass []) of
 			Mfalse -> Mfalse
-			Mtrue -> av1 xs ass lst
-			Assign lst2 -> av1 xs ass (lst2 ++ lst)
+			Mtrue -> assignCl xs ass lst
+			Assign lst2 -> assignCl xs ass (lst2 ++ lst)
 
 	av2 :: [Literal] -> Assignment -> [Literal] -> Formula
 	av2 [] ass [] = Mfalse	
@@ -61,14 +75,19 @@ module Satsolve where
 	getVal var ((x,y):xs) | (var == x) && (not y) = Fl
 	getVal var ((x,y):xs) | otherwise = getVal var xs
 
---        modify :: (Assignment -> (Formula, Assignment)) -> (Assignment -> Identity -> (Formula, Assignment))
-
         stateFormula :: Formula -> S.State Assignment Formula
         stateFormula formula = do
                                 z <- S.get
                                 let (y,x) = assignValues formula z
-                                --let y = fst x
                                 return y
+
+        stateUnsat :: Formula -> S.State Assignment Int
+        stateUnsat formula = do
+                                z <- S.get
+                                let y = getUnsat formula z
+                                return y
+
+
 
 --	stateFormula :: Formula -> S.State Assignment Formula
 --	stateFormula formula = S.StateT sFormula 
