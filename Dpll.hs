@@ -69,18 +69,21 @@
                 let var = words vr
                 let form = Assign frm
                 print (bt form var)
-                print $ printf form
+               -- print $ printf form
 --                ass <- getLine
 --                let assgn = formA (words var) (words ass)
 --                let a = (getUnsat (Assign form) assgn)
                 --let (c,b) = gsatrun (Assign form) (words var) [] assgn
                 --let d = (getUnsat (Assign form) b)
-                let y = runMultiple form var 100
-                print (getUnsat form y)
+                let y = runMultiple form var 100 100
+                let ux = getUnsat form y
+		if(ux==0)
+			then print True
+			else print False
 		--print a
 		--print b
 		--print d
-	        print y
+	        --print y
                 let (d,dl) = S.runState dpll form
                 print d
                 
