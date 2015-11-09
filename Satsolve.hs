@@ -23,6 +23,11 @@ module Satsolve where
 
 	data Trilean = Tr | Fl | Unav
 
+        same :: Formula -> Formula -> Bool
+        same Mtrue Mtrue = True
+        same Mfalse Mfalse = True
+        same _ _ = False
+
 	assignValues :: Formula -> Assignment -> (Formula, Assignment)
 	assignValues Mtrue ass = (Mtrue, ass)
 	assignValues Mfalse ass = (Mfalse, ass)
