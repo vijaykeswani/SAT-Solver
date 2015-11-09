@@ -1,4 +1,5 @@
-	import Satsolve
+module Gsat where
+        import Satsolve
 	import Backtrack
 	import qualified Control.Monad.State.Lazy as S
         import System.Random
@@ -59,7 +60,7 @@
                     assgn = getRandomAss 22 var
                     k = getUnsat form y
 
-        main = do
+{-        main = do
                 var <- getLine
                 num <- getLine
                 form <- getIn (read num)
@@ -75,4 +76,4 @@
 		--print b
 		--print d
 	        print y
-            
+-}            
