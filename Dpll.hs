@@ -22,9 +22,31 @@
                                         (z, Mtrue) -> (z, Mtrue)
                                         (z, Mfalse) -> (z, Mfalse)
                                         (z, Assign y) -> (z, Assign (x:y))
-   
-    dpllRunSt :: S.State Formula Assignment
-    dpllRunSt = S.state (\form -> (unitPropogate form form))
+  
+    findPure :: Formula -> [Variable] -> [(String, Bool)]
+    findPure Mtrue _ = []
+    findPure Mfalse _ = []
+    findPure form [] = []
+    findPure form (x:xs) = (checkPure form x):(findPure form xs)
+
+    purify :: Formula -> Variables -> (Assignment, Formula)
+    purify form var = (z,y)
+		where 	ass = findPure form var
+			(y,z) = S.runState stForm ass	 
+			stForm = stateFormula form
+
+    checkPure :: Formula -> Variable -> (String, Bool)
+    checkPure form x | (getSat form [(x,True)]) == 0 = (x,False)
+		     | (getSat form [(x,False)]) == 0 = (x,True) 
+                     | otherwise = ("_",True)
+
+    
+ 
+    dpllUnitRunSt :: S.State Formula Assignment
+    dpllUnitRunSt = S.state (\form -> (unitPropogate form form))
+
+    dpllPureRunSt :: Variables -> S.State Formula Assignment
+    dpllPureRunSt var = S.state (\form -> (purify form var))
 
     getNext :: Formula -> Variable
     getNext (Assign (((Same y):ys):xs)) = y
@@ -33,8 +55,9 @@
 
     printa = \x ->  do putStrLn x
 
-    dpll = do
-        ass <- dpllRunSt
+    dpll var = do
+        ass1 <- dpllUnitRunSt
+	ass2 <- dpllPureRunSt var
 --        printa ass
         form <- S.get
         if( same form Mtrue)
@@ -48,14 +71,14 @@
                         else do
                             let stForm = stateFormula form
                             let (y,ay) = S.runState stForm [(x,True)]
-                            let (z,fz) = S.runState dpll y
+                            let (z,fz) = S.runState (dpll var) y
                             if z
                                 then do
                                     --print ass
                                     return z
                                 else do
                                     let (y,ay) = S.runState stForm [(x,False)]
-                                    let (z,fz) = S.runState dpll y
+                                    let (z,fz) = S.runState (dpll var) y
                                     --if z
                                     --    then print ass
                                     return z
@@ -84,7 +107,7 @@
 		--print b
 		--print d
 	        --print y
-                let (d,dl) = S.runState dpll form
+                let (d,dl) = S.runState (dpll var) form
                 print d
                 
  

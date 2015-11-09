@@ -33,11 +33,17 @@ module Satsolve where
 	assignValues Mfalse ass = (Mfalse, ass)
 	assignValues (Assign lst) assignment = (assignCl lst assignment [], assignment)
 
+	countClauses :: Formula -> Int
+	countClauses (Assign (x:xs)) = 1 + (countClauses (Assign xs))
+	countClauses _ = 0
+
 	getUnsat :: Formula -> Assignment -> Int
 	getUnsat Mtrue ass = 0
 	getUnsat Mfalse ass = 1
 	getUnsat (Assign lst) assignment = result
 		where (_,result) = av1 lst assignment [] 0
+
+	getSat form ass = (countClauses form) - (getUnsat form ass)
 
 	av1 :: [Clause] -> Assignment -> [Clause] -> Int -> (Formula,Int)
  	av1 [] _ [] n = (Mtrue, n)
