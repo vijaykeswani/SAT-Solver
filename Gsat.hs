@@ -53,11 +53,11 @@ module Gsat where
                    --         1 -> True
                    --         0 -> False
         
-        runMultiple form var _ 0 = getRandomAss 33 var
+        runMultiple form var _ 0 = getRandomAss 100 var
         runMultiple form var m n    | k==0 = y
                             | otherwise = runMultiple form var m (n-1)
             where   (x,y) = S.runState (gsat form m var assgn) assgn
-                    assgn = getRandomAss 22 var
+                    assgn = getRandomAss n var
                     k = getUnsat form y
 
 {-        main = do
