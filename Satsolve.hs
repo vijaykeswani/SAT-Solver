@@ -40,8 +40,9 @@ module Satsolve where
 	getUnsat :: Formula -> Assignment -> Int
 	getUnsat Mtrue ass = 0
 	getUnsat Mfalse ass = 1
-	getUnsat (Assign lst) assignment = result
-		where (_,result) = av1 lst assignment [] 0
+	getUnsat (Assign lst) assignment = case (av1 lst assignment [] 0) of
+                                            (Assign lst, result) -> 1
+                                            (_, result) -> result
 
 	getSat form ass = (countClauses form) - (getUnsat form ass)
 
