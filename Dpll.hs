@@ -94,9 +94,11 @@
                 let z = bt form var
                 let uz = getUnsat form z
 		if(uz==0)
-			then print True
+			then do 
+                            print True
+                            print z
 			else print False
-		print z
+--                print z
 	              -- print $ printf form
 --                ass <- getLine
 --                let assgn = formA (words var) (words ass)
