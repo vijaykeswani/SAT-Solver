@@ -1,9 +1,11 @@
 module Backtrack where
 	import Satsolve
         import qualified Control.Monad.State.Lazy as S
+	import Control.Monad.ST
+	import Data.STRef
 
-	bt :: Formula -> [Variable] -> Bool
-	
+--	bt :: Formula -> [Variable] -> STRef s1 [([Char], Bool)] -> Bool
+{-	
 	bt formula [x] = mor form2 form3
 		where 	(form2, ass1) = S.runState stateF [(x,True)]
 			(form3, ass2) = S.runState stateF [(x,False)]
@@ -15,6 +17,41 @@ module Backtrack where
 			(form3, ass2) = S.runState stateF [(x,False)]
 			form5 = bt form3 xs
 			stateF = stateFormula formula
+-}
+	bt form var  = runST $ do
+	  sol <- newSTRef []
+       	  rx <- bt' form var sol	
+	  readSTRef sol	
+
+	  where	bt' form [v] sol = do
+			let (form1, ass1) = assignValues form [(v, True)]
+			let (form2, ass2) = assignValues form [(v, False)]
+			sol <- newSTRef []
+			--s <- readSTRef sol'
+			if (same Mtrue form1)
+				then (writeSTRef sol [(v,True)])
+				else do
+					if (same Mtrue form2)
+						then (writeSTRef sol [(v,False)])
+						else (writeSTRef sol [])
+			return (mor form1 form2)
+
+	  	bt' form (v:vs) sol = do
+--		forM_ var \v -> do
+			let (form1, ass1) = assignValues form [(v, True)]
+			res1 <- bt' form1 vs sol
+			let (form2, ass2) = assignValues form [(v, False)]
+			res2 <- bt' form2 vs sol
+--			let s = readSTRef sol
+			if res1
+				then (modifySTRef sol (putF (v,True)))
+				else do
+					if res2
+						then (modifySTRef sol (putF (v,False)))
+						else (modifySTRef sol (putF ("_",False)))
+			return (res1 || res2)
+
+	putF x y = x:y
 
 	literate :: [Variable] -> [Literal]
 	
