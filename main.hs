@@ -2,6 +2,7 @@
     import Gsat
     import Backtrack
     import Dpll
+    import KarloffZwick
     import qualified Control.Monad.State.Lazy as S
     import Control.Exception
     import Data.Time
@@ -53,5 +54,12 @@
                 print d
                 end   <- getCurrentTime
                 print (diffUTCTime end start)
+		putStrLn ""
+
+		let w = kz form var
+		let uw = getUnsat form w 
+		print w
+		print uw	
+
 
 
