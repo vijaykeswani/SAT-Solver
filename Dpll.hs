@@ -1,7 +1,10 @@
+module Dpll where
     import Satsolve
     import Gsat
     import Backtrack
     import qualified Control.Monad.State.Lazy as S
+    import Data.Time
+
 
     getLiteral :: Literal -> (Variable, Bool)
     getLiteral (Same x) = (x, True)
@@ -84,37 +87,6 @@
                                     return z
                     
 --            else let x = getNext form
-
-    main = do
-                vr <- getLine
-                num <- getLine
-                frm <- getIn (read num)
-                let var = words vr
-                let form = Assign frm
-                let z = bt form var
-                let uz = getUnsat form z
-		if(uz==0)
-			then do 
-                            print True
-                            print z
-			else print False
---                print z
-	              -- print $ printf form
---                ass <- getLine
---                let assgn = formA (words var) (words ass)
---                let a = (getUnsat (Assign form) assgn)
-                --let (c,b) = gsatrun (Assign form) (words var) [] assgn
-                --let d = (getUnsat (Assign form) b)
-                let y = runMultiple form var 1 1
-                let ux = getUnsat form y
-		if(ux==0)
-			then print True
-			else print False
-		--print a
-		--print b
-		--print d
-	        print y
-                let (d,dl) = S.runState (dpll var) form
-                print d
+               
                 
  
