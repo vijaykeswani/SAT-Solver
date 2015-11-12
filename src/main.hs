@@ -50,7 +50,7 @@
 		--print d
 	        --print y
                 start <- getCurrentTime
-                let d = (dpll var) form
+                let (d,dl) = S.runState (dpll var) form
                 print d
                 end   <- getCurrentTime
                 print (diffUTCTime end start)

@@ -58,10 +58,10 @@ module Dpll where
     getNext _ = "_"
 
     printa = \x ->  do putStrLn x
-{-
+
     dpll var = do
         ass1 <- dpllUnitRunSt
-	ass2 <- dpllPureRunSt var
+--	ass2 <- dpllPureRunSt var
 --        printa ass
         form <- S.get
         if( same form Mtrue)
@@ -88,14 +88,14 @@ module Dpll where
                                     return z
                     
 --            else let x = getNext form
--}               
+               
  
-
+{-
     join a b = a ++ b
 
 
-    dpll var form = runST $ do
-	      sol <- newSTRef []
+    dpll var = do
+{-	      sol <- newSTRef []
 	      t <- newSTRef $! (dpll' var sol form) 	
 	      readSTRef t
 	      readSTRef sol
@@ -103,10 +103,11 @@ module Dpll where
 	      where dpll' var sol = S.runState $! do
 		     
 		    return $! (writeSTRef sol [("a",True)])
-		    ass1 <- dpllUnitRunSt
-		    ass2 <- dpllPureRunSt var
-		    return (modifySTRef sol (join ass1))
-		    return (modifySTRef sol (join ass2))
+-}		    ass1 <- dpllUnitRunSt
+--		    ass2 <- dpllPureRunSt var
+
+--                    return (modifySTRef sol (join ass1))
+--		    return (modifySTRef sol (join ass2))
 	--        printa ass
 		    form <- S.get
 		    if( same form Mtrue)
@@ -120,20 +121,20 @@ module Dpll where
 					else do
 					    let stForm = stateFormula form
 					    let (y,ay) = S.runState stForm [(x,True)]
-					    let (z,fz) = (dpll' var sol) y
+					    let (z,fz) = S.runState (dpll var) y
 					    if z
 						then do
 						    --print ass
-						    let ass = [(x,True)]
-						    let fg = (modifySTRef sol (++ass))
+--						    let ass = [(x,True)]
+--						    let fg = (modifySTRef sol (++ass))
 						    return z
 						else do
 						    let (y,ay) = S.runState stForm [(x,False)]
-						    let (z,fz) = (dpll' var sol) y
+						    let (z,fz) = S.runState(dpll var) y
 						    --if z
 						    --    then print ass
-						    let ass = [(x,False)]
-						    let fg = (modifySTRef sol (++ass))
+--						    let ass = [(x,False)]
+--						    let fg = (modifySTRef sol (++ass))
 						    return z
 	  
-
+-}
