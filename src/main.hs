@@ -8,6 +8,34 @@
     import Data.Time
 
 
+    literate :: [Variable] -> [Literal]
+    
+    literate [] = []
+    literate ((x:[]):xs) = (Same [x]):(literate xs)
+    literate ((x:y):xs) = (Negate y):(literate xs)
+
+    printf :: Formula -> [[String]]
+    printf (Assign (x:xs)) = (printc x):(printf (Assign xs))
+    printf _ = []
+
+    printc :: Clause -> [String]
+    printc [] = []
+    printc ((Same x):xs) = x : (printc xs)
+    printc ((Negate x):xs) = ('~':x):(printc xs)
+
+    getIn 0 = do 
+            return []
+    getIn num = do
+            f <- getLine
+            let c1 = literate $ words f
+            x2 <- getIn (num-1)
+            return (c1:x2)
+    
+    formA :: [Variable] -> [String] -> [(Variable, Bool)]
+    formA (v:vs) (x:xs) | x=="1" = (v,True): (formA vs xs)
+                    | otherwise = (v,False) : (formA vs xs)
+    formA _ _ = []
+
     main = do
                 vr <- getLine
                 num <- getLine
