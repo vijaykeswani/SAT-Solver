@@ -45,15 +45,16 @@
                 start <- getCurrentTime
                 let z = bt form var
                 let uz = getUnsat form z
+                putStrLn "\nBacktracking : "
 		if(uz==0)
 			then do 
-                            print True
---                            print z
-			else print False
+                            putStrLn "SAT"
+                            print z
+			else putStrLn "UNSAT"
                 end   <- getCurrentTime
                 print (diffUTCTime end start)
  
-                putStrLn ""
+                putStrLn "\nGSAT : "
 --                print z
 	              -- print $ printf form
 --                ass <- getLine
@@ -67,26 +68,29 @@
                 let ux = getUnsat form y
 		if(ux==0)
 			then do 
-                            print True
---                            print y
-			else print False
+                            putStrLn "SAT"
+                            print y
+			else putStrLn "UNSAT"
                 end   <- getCurrentTime
                 print (diffUTCTime end start)
-                putStrLn ""
+                putStrLn "\nDPLL : "
                 --print a
 		--print b
 		--print d
 	        --print y
                 start <- getCurrentTime
                 let (d,dl) = S.runState (dpll var) form
-                print d
+                if d
+                    then putStrLn "SAT"
+                    else putStrLn "UNSAT"
                 end   <- getCurrentTime
                 print (diffUTCTime end start)
-		putStrLn ""
+		putStrLn "\nKarloff-Zwick : "
 
 		let w = kz form var
 		let uw = getUnsat form w 
-		print w
+                print w	
+                putStrLn "No. of clauses unsatisfied : "
 		print uw	
 
 
