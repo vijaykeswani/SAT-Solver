@@ -1,4 +1,4 @@
-module Gsat where
+module Gsat(runMultiple) where
         import Satsolve
 	import Backtrack
 	import qualified Control.Monad.State.Lazy as S

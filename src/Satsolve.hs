@@ -1,4 +1,4 @@
-module Satsolve where
+module Satsolve (Variable, DoubtFul(Mtrue, Mfalse, Assign) , BVariable(Same, Negate), Literal, Clause, Formula, Variables, Assignment, same, assignValues, getUnsat, getSat, mor, stateFormula) where
 	import qualified Control.Monad.State.Lazy as S
         import Data.Functor.Identity
 	

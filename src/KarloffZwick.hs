@@ -1,4 +1,4 @@
-module KarloffZwick where
+module KarloffZwick(kz) where
 	import Satsolve
 	import Backtrack
 	import Control.Monad.ST

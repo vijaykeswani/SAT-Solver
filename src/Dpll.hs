@@ -1,4 +1,4 @@
-module Dpll where
+module Dpll(unitPropogate, findPure, dpll) where
     import Satsolve
     import Gsat
     import Backtrack
