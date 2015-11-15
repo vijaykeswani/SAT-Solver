@@ -1,42 +1,41 @@
-module Satsolve (Variable, DoubtFul(Mtrue, Mfalse, Assign) , BVariable(Same, Negate), Literal, Clause, Formula, Variables, Assignment, same, assignValues, getUnsat, getSat, mor, stateFormula) where
-	import qualified Control.Monad.State.Lazy as S
+module Satsolve (Variable, DoubtFul(Mtrue, Mfalse, Assign) , 
+        BVariable(Same, Negate), Literal, Clause, Formula, Variables, 
+        Assignment, same, assignValues, getUnsat, getSat, mor, stateFormula) where
+	
+        
+        import qualified Control.Monad.State.Lazy as S
         import Data.Functor.Identity
 	
---	newtype State s a = State { runState :: (s -> (a,s)) }
---	type State s  = S.StateT s Identity
-     
-
 	type Variable = String
 
 	data BVariable a = Same a | Negate a
-
+    
+        -- | A literal can either be a variable or the negation of a variable
 	type Literal = BVariable Variable 
+        -- | A clause is a set of literals
 	type Clause = [Literal]
 
 	data DoubtFul a = Mtrue 
 			| Mfalse 
 			| Assign [a]
 
+        -- | A formula can either be True or False or a set of unsatisfied clauses
 	type Formula = DoubtFul Clause
 	type Variables = [Variable]
+
+        -- | An Assignment is a list of variables and their boolean values
 	type Assignment = [(Variable,Bool)]
 
 	data Trilean = Tr | Fl | Unav
-
-        same :: Formula -> Formula -> Bool
-        same Mtrue Mtrue = True
-        same Mfalse Mfalse = True
-        same _ _ = False
-
-	assignValues :: Formula -> Assignment -> (Formula, Assignment)
+       	
+        -- | This function takes a Formula and an Assignment and returns the resultant Formula from applying the Assignment to the initial one
+        assignValues :: Formula -> Assignment -> (Formula, Assignment)
 	assignValues Mtrue ass = (Mtrue, ass)
 	assignValues Mfalse ass = (Mfalse, ass)
 	assignValues (Assign lst) assignment = (assignCl lst assignment [], assignment)
 
-	countClauses :: Formula -> Int
-	countClauses (Assign (x:xs)) = 1 + (countClauses (Assign xs))
-	countClauses _ = 0
-
+    
+        -- | This function takes a Formula and Assignment and returns the number of clauses not satisfied by this assignment
 	getUnsat :: Formula -> Assignment -> Int
 	getUnsat Mtrue ass = 0
 	getUnsat Mfalse ass = 1
@@ -44,6 +43,7 @@ module Satsolve (Variable, DoubtFul(Mtrue, Mfalse, Assign) , BVariable(Same, Neg
                                             (Assign lst, result) -> 1
                                             (_, result) -> result
 
+        -- | This function takes a Formula and Assignment and returns the number of clauses satisfied by this assignment
 	getSat form ass = (countClauses form) - (getUnsat form ass)
 
 	av1 :: [Clause] -> Assignment -> [Clause] -> Int -> (Formula,Int)
@@ -87,6 +87,7 @@ module Satsolve (Variable, DoubtFul(Mtrue, Mfalse, Assign) , BVariable(Same, Neg
 	getVal var ((x,y):xs) | (var == x) && (not y) = Fl
 	getVal var ((x,y):xs) | otherwise = getVal var xs
 
+        -- | Given a formula, it creates the State monad corresponding to the formula
         stateFormula :: Formula -> S.State Assignment Formula
         stateFormula formula = do
                                 z <- S.get
@@ -99,6 +100,18 @@ module Satsolve (Variable, DoubtFul(Mtrue, Mfalse, Assign) , BVariable(Same, Neg
                                 let y = getUnsat formula z
                                 return y
 
+	
+        countClauses :: Formula -> Int
+	countClauses (Assign (x:xs)) = 1 + (countClauses (Assign xs))
+	countClauses _ = 0
+
+ 
+        -- | Takes two formulas as input and checks if both are True or both are False
+        same :: Formula -> Formula -> Bool
+        same Mtrue Mtrue = True
+        same Mfalse Mfalse = True
+        same _ _ = False
+
 
 
 --	stateFormula :: Formula -> S.State Assignment Formula
@@ -107,7 +120,7 @@ module Satsolve (Variable, DoubtFul(Mtrue, Mfalse, Assign) , BVariable(Same, Neg
 --                                let x = assignValues formula
 --                                return x
                                 
-
+        -- | Corresponding to the contructors in Doubtful data-type, this return the OR of the two formulas given
 	mor :: Formula -> Formula -> Bool
 	mor Mfalse Mfalse = False
 	mor _ _ = True

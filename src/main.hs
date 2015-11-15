@@ -55,13 +55,7 @@
                 print (diffUTCTime end start)
  
                 putStrLn "\nGSAT : "
---                print z
-	              -- print $ printf form
---                ass <- getLine
---                let assgn = formA (words var) (words ass)
---                let a = (getUnsat (Assign form) assgn)
-                --let (c,b) = gsatrun (Assign form) (words var) [] assgn
-                --let d = (getUnsat (Assign form) b)
+                
                 start <- getCurrentTime
                 let y = runMultiple form var 2 2
                
@@ -74,10 +68,6 @@
                 end   <- getCurrentTime
                 print (diffUTCTime end start)
                 putStrLn "\nDPLL : "
-                --print a
-		--print b
-		--print d
-	        --print y
                 start <- getCurrentTime
                 let (d,dl) = S.runState (dpll var) form
                 if d

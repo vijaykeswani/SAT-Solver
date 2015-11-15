@@ -3,7 +3,9 @@ module KarloffZwick(kz) where
 	import Backtrack
 	import Control.Monad.ST
 	import Data.STRef
-	
+
+        -- | Runs the Karloff-Zwick algorithm on a 3SAT formula, returning the appropriate approximate assignment
+        kz :: Formula -> Variables -> Assignment
 	kz form var = runST $ do
 		sol <- newSTRef []
 		kz' form var sol

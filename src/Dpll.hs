@@ -11,6 +11,7 @@ module Dpll(unitPropogate, findPure, dpll) where
     getLiteral (Same x) = (x, True)
     getLiteral (Negate x) = (x, False)
 
+    -- | Given a formula, searches for a clause with only one literal and returns and assignment which will remove such a unit clause and the new formula
     unitPropogate :: Formula -> Formula -> (Assignment, Formula)
     unitPropogate Mtrue _ = ([], Mtrue)
     unitPropogate Mfalse _ = ([], Mfalse)
@@ -26,8 +27,9 @@ module Dpll(unitPropogate, findPure, dpll) where
                                         (z, Mtrue) -> (z, Mtrue)
                                         (z, Mfalse) -> (z, Mfalse)
                                         (z, Assign y) -> (z, Assign (x:y))
-  
-    findPure :: Formula -> [Variable] -> [(String, Bool)]
+ 
+    -- | Given a formula and the set of variables, this function finds the pure variables in the formula, and returns their corresponding true assignment
+    findPure :: Formula -> [Variable] -> [(Variable, Bool)]
     findPure Mtrue _ = []
     findPure Mfalse _ = []
     findPure form [] = []
@@ -59,10 +61,10 @@ module Dpll(unitPropogate, findPure, dpll) where
 
     printa = \x ->  do putStrLn x
 
+    -- | Runs the DPLL algorithm with Unit Propogation, moving from one assignment state to another in each iteration
     dpll var = do
         ass1 <- dpllUnitRunSt
 --	ass2 <- dpllPureRunSt var
---        printa ass
         form <- S.get
         if( same form Mtrue)
             then return True
@@ -78,63 +80,9 @@ module Dpll(unitPropogate, findPure, dpll) where
                             let (z,fz) = S.runState (dpll var) y
                             if z
                                 then do
-                                    --print ass
                                     return z
                                 else do
                                     let (y,ay) = S.runState stForm [(x,False)]
                                     let (z,fz) = S.runState (dpll var) y
-                                    --if z
-                                    --    then print ass
                                     return z
                     
---            else let x = getNext form
-               
- 
-{-
-    join a b = a ++ b
-
-
-    dpll var = do
-{-	      sol <- newSTRef []
-	      t <- newSTRef $! (dpll' var sol form) 	
-	      readSTRef t
-	      readSTRef sol
-
-	      where dpll' var sol = S.runState $! do
-		     
-		    return $! (writeSTRef sol [("a",True)])
--}		    ass1 <- dpllUnitRunSt
---		    ass2 <- dpllPureRunSt var
-
---                    return (modifySTRef sol (join ass1))
---		    return (modifySTRef sol (join ass2))
-	--        printa ass
-		    form <- S.get
-		    if( same form Mtrue)
-			    then return True
-			    else if(same form Mfalse)
-				then return False
-				else do
-				    let x = getNext form
-				    if(x == "_")
-					then return False
-					else do
-					    let stForm = stateFormula form
-					    let (y,ay) = S.runState stForm [(x,True)]
-					    let (z,fz) = S.runState (dpll var) y
-					    if z
-						then do
-						    --print ass
---						    let ass = [(x,True)]
---						    let fg = (modifySTRef sol (++ass))
-						    return z
-						else do
-						    let (y,ay) = S.runState stForm [(x,False)]
-						    let (z,fz) = S.runState(dpll var) y
-						    --if z
-						    --    then print ass
---						    let ass = [(x,False)]
---						    let fg = (modifySTRef sol (++ass))
-						    return z
-	  
--}
